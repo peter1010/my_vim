@@ -1,0 +1,89 @@
+if v:lang =~ "utf8$" || v:lang =~ "UTF-8$"
+   set fileencodings=utf-8,latin1
+endif
+
+set nocompatible	" Use Vim defaults (much better!)
+
+" I use an indent of 4 in my code... but leave normal tabs at 8!
+set shiftwidth=4
+set softtabstop=4
+set autoindent
+
+set expandtab
+
+" set lines=50
+" set columns=88
+set number
+
+set bs=indent,eol,start		" allow backspacing over everything in insert mode
+"set ai			" always set autoindenting on
+"set backup		" keep a backup file
+set viminfo='20,\"50	" read/write a .viminfo file, don't store more
+			" than 50 lines of registers
+set history=50		" keep 50 lines of command line history
+set ruler		" show the cursor position all the time
+set incsearch           " Do search as one entries the search target
+
+" set foldcolumn=2        " Add margin for fold marks
+
+" All my user commands start with F12
+"let mapleader = "\<F12>"
+"let mapleader = "-"
+
+"edit my vimrc file
+nnoremap <F12>ev :vsplit $MYVIMRC<cr>
+
+nnoremap <F12>sv :source $MYVIMRC<cr>
+
+"set efm=%*[^\"]\"%f\"%*\D%l:\ %m
+"set efm+=\"%f\"%*\D%l:\ %m
+"set efm+=%-G%f:%l:\ (Each\ undeclared\ identifier\ is\ reported\ only\ once
+"set efm+=%-G%f:%l:\ for\ each\ function\ it\ appears\ in.)
+"set efm+=%-GIn\ file\ included\ from\ %f:%l:%c:
+"set efm+=%-GIn\ file\ included\ from\ %f:%l:%c\,
+"set efm+=%-GIn\ file\ included\ from\ %f:%l:%c\ 
+"set efm+=%-GIn\ file\ included\ from\ %f:%l
+"set efm+=%-G%*[\ ]from\ %f:%l:%c
+"set efm+=%-G%*[\ ]from\ %f:%l:
+"set efm+=%-G%*[\ ]from\ %f:%l\,
+"set efm+=%-G%*[\ ]from\ %f:%l
+"set efm+=%f:%l:%c:%m
+"set efm+=%f(\ %l):%m
+"set efm+=%f:%l:%m
+"set efm+=\"%f\"\,\ line\ %l%*\D%c%*[^\ ]\ %m
+set efm+=%D%*\\a[%*\\d]:\ Entering\ directory\ '%f'
+set efm+=%X%*\\a[%*\\d]:\ Leaving\ directory\ '%f'
+set efm+=%D%*\\a:\ Entering\ directory\ '%f'
+set efm+=%X%*\\a:\ Leaving\ directory\ '%f'
+"set efm+=%DMaking\ %*\\a\ in\ %f
+"set efm+=%f\|%l\|\ %m
+
+
+" Only do this part when compiled with support for autocommands
+if has("autocmd")
+  " In text files, always limit the width of text to 78 characters
+  autocmd BufRead *.txt set tw=78
+  " When editing a file, always jump to the last cursor position
+  autocmd BufReadPost *
+  \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+  \   exe "normal! g'\"" |
+  \ endif
+endif
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+filetype plugin indent on
+
+autocmd FileType html set shiftwidth=2
+autocmd FileType html set softtabstop=2
+
+if &term=="xterm"
+     set t_Co=8
+     set t_Sb=[4%dm
+     set t_Sf=[3%dm
+endif
