@@ -9,6 +9,13 @@ if !has('python')
     finish
 endif
 
+let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h")
+
+echom "path is" . s:path
+
+function! Snippet()
+    execute 'pyfile' . s:path . '/snippet.py'
+endfunc
+
+command! SNIPPET call Snippet()
 " keys
-
-
