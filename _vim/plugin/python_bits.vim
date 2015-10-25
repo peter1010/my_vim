@@ -11,7 +11,7 @@ endif
 
 let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h")
 
-echom "path is" . s:path
+" echom "path is" . s:path
 
 function! Snippet()
     execute 'pyfile' . s:path . '/snippet.py'
