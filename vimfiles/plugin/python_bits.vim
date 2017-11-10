@@ -9,6 +9,8 @@ if !has('python')
     finish
 endif
 
+" 1/ expand source script file to full path
+" 2/
 let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h")
 
 " echom "path is" . s:path

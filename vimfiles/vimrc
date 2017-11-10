@@ -84,7 +84,7 @@ autocmd FileType html set shiftwidth=2
 autocmd FileType html set softtabstop=2
 
 if &term=="xterm"
-     set t_Co=8
+     set t_Co=8        " Set number of colours to 8 (same as linux console)
      set t_Sb=[4%dm
      set t_Sf=[3%dm
 endif
