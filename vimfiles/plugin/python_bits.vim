@@ -1,4 +1,6 @@
 " If already done, exit early
+" g: means global namespace
+
 if exists('g:did_my_python_bits')
     finish
 endif
@@ -9,13 +11,17 @@ if !has('python')
     finish
 endif
 
-" 1/ expand source script file to full path
-" 2/
+" Expand source script file to full path
+" The s: put the variable in the script's namespace
 let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h")
 
 " echom "path is" . s:path
 
-function! Snippet()
+"& in from of a option means treat the option as a variable
+"This means the option is set to the evaluation of the expression
+let &makeprg = 'python "' . s:path . '/build.py" %:p'
+
+function! Snippet() 
     execute 'pyfile' . s:path . '/snippet.py'
 endfunc
 
