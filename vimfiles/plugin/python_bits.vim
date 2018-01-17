@@ -25,5 +25,10 @@ function! Snippet()
     execute 'pyfile' . s:path . '/snippet.py'
 endfunc
 
+function! Tabify()
+    execute 'pyfile' . s:path . '/tabify.py'
+endfunc
+    
 command! SNIPPET call Snippet()
+command! TABIFY call Tabify()
 " keys
