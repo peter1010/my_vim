@@ -22,13 +22,22 @@ let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h")
 let &makeprg = 'python "' . s:path . '/build.py" %:p'
 
 function! Snippet() 
-    execute 'pyfile' . s:path . '/snippet.py'
+    execute 'pyfile ' . s:path . '/snippet.py'
 endfunc
 
 function! Tabify()
-    execute 'pyfile' . s:path . '/tabify.py'
+    execute 'python import sys'
+    execute 'python sys.argv = ["t"]'
+    execute 'pyfile ' . s:path . '/tabify.py'
+endfunc
+
+function! Spacify()
+    execute 'python import sys'
+	execute 'python sys.argv = ["s"]'
+    execute 'pyfile ' . s:path . '/tabify.py'
 endfunc
     
 command! SNIPPET call Snippet()
 command! TABIFY call Tabify()
+command! SPACIFY call Spacify()
 " keys
