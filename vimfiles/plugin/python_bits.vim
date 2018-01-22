@@ -13,9 +13,9 @@ endif
 
 " Expand source script file to full path
 " The s: put the variable in the script's namespace
-let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h")
+let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h:h") . '/py_scripts'
 
-" echom "path is" . s:path
+" echom "path is " . s:path
 
 "& in from of a option means treat the option as a variable
 "This means the option is set to the evaluation of the expression
@@ -33,7 +33,7 @@ endfunc
 
 function! Spacify()
     execute 'python import sys'
-	execute 'python sys.argv = ["s"]'
+    execute 'python sys.argv = ["s"]'
     execute 'pyfile ' . s:path . '/tabify.py'
 endfunc
     
