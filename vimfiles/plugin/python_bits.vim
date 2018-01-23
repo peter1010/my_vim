@@ -37,7 +37,13 @@ function! Spacify()
     execute 'pyfile ' . s:path . '/tabify.py'
 endfunc
     
+function! Gtag()
+    execute 'pyfile ' . s:path . '/gtags.py'
+endfunc
+
 command! SNIPPET call Snippet()
 command! TABIFY call Tabify()
 command! SPACIFY call Spacify()
+command! GTAG call Gtag()
+
 " keys
