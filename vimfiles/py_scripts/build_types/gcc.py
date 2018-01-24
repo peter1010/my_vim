@@ -1,11 +1,14 @@
 # Build Code
 import os
 import subprocess
+import re
 
 class GCC:
 
 	def __init__(self):
-		pass
+		self.enter_match = re.compile(r'Entering directory')
+		self.leave_match = re.compile(r'Leaving directory')
+
 
 	def can_build(self, dirname, ext):
 		if ext in (".c", ".h", ".cpp", ".hpp"):
@@ -20,13 +23,14 @@ class GCC:
 		if action:
 			args.append(action)
 		print(args)
-		proc =subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		errorLines = []
 		while True:
 			line = proc.stdout.readline().decode("utf-8")
 			if len(line) == 0:
 				break
-			
+			output.write(line)
+
 			if line.startswith("In file included from"):
 				errorLines.append(line)
 			else:

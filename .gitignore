@@ -1,0 +1,5 @@
+*.pyc
+viminfo
+GPATH
+GTAGS
+GRTAGS

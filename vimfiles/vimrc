@@ -1,3 +1,10 @@
+" My vimrc file.
+
+" When started as "evim", evim.vim will already have done these settings.
+if v:progname =~? "evim"
+  finish
+endif
+
 if v:lang =~ "utf8$" || v:lang =~ "UTF-8$"
    set fileencodings=utf-8,latin1
 endif
@@ -37,29 +44,6 @@ set vb t_vb=
 nnoremap <F12>ev :vsplit $MYVIMRC<cr>
 
 nnoremap <F12>sv :source $MYVIMRC<cr>
-
-"set efm=%*[^\"]\"%f\"%*\D%l:\ %m
-"set efm+=\"%f\"%*\D%l:\ %m
-"set efm+=%-G%f:%l:\ (Each\ undeclared\ identifier\ is\ reported\ only\ once
-"set efm+=%-G%f:%l:\ for\ each\ function\ it\ appears\ in.)
-"set efm+=%-GIn\ file\ included\ from\ %f:%l:%c:
-"set efm+=%-GIn\ file\ included\ from\ %f:%l:%c\,
-"set efm+=%-GIn\ file\ included\ from\ %f:%l:%c\ 
-"set efm+=%-GIn\ file\ included\ from\ %f:%l
-"set efm+=%-G%*[\ ]from\ %f:%l:%c
-"set efm+=%-G%*[\ ]from\ %f:%l:
-"set efm+=%-G%*[\ ]from\ %f:%l\,
-"set efm+=%-G%*[\ ]from\ %f:%l
-"set efm+=%f:%l:%c:%m
-"set efm+=%f(\ %l):%m
-"set efm+=%f:%l:%m
-"set efm+=\"%f\"\,\ line\ %l%*\D%c%*[^\ ]\ %m
-set efm+=%D%*\\a[%*\\d]:\ Entering\ directory\ '%f'
-set efm+=%X%*\\a[%*\\d]:\ Leaving\ directory\ '%f'
-set efm+=%D%*\\a:\ Entering\ directory\ '%f'
-set efm+=%X%*\\a:\ Leaving\ directory\ '%f'
-"set efm+=%DMaking\ %*\\a\ in\ %f
-"set efm+=%f\|%l\|\ %m
 
 "Stop the default menus in gvim (we want our own)
 let did_install_default_menus = 4

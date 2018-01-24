@@ -71,31 +71,27 @@ inoremenu <script> <silent> 20.400 &Edit.&Select\ All<Tab>ggVG	<C-O>:call <SID>S
 cnoremenu <script> <silent> 20.400 &Edit.&Select\ All<Tab>ggVG	<C-U>call <SID>SelectAll()<CR>
 
 an 20.405	 &Edit.-SEP2-				<Nop>
-if has("win32") || has("gui_gtk") || has("gui_kde") || has("gui_motif")
-  an 20.410	 &Edit.&Find\.\.\.			:promptfind<CR>
-  vunmenu	 &Edit.&Find\.\.\.
-  vnoremenu <silent>	 &Edit.&Find\.\.\.		y:promptfind <C-R>=<SID>FixFText()<CR><CR>
-  an 20.420	 &Edit.Find\ and\ Rep&lace\.\.\.	:promptrepl<CR>
-  vunmenu	 &Edit.Find\ and\ Rep&lace\.\.\.
-  vnoremenu <silent>	 &Edit.Find\ and\ Rep&lace\.\.\. y:promptrepl <C-R>=<SID>FixFText()<CR><CR>
-else
-  an 20.410	 &Edit.&Find<Tab>/			/
-  an 20.420	 &Edit.Find\ and\ Rep&lace<Tab>:%s	:%s/
-  vunmenu	 &Edit.Find\ and\ Rep&lace<Tab>:%s
-  vnoremenu	 &Edit.Find\ and\ Rep&lace<Tab>:s	:s/
-endif
+an 20.410	 &Edit.&Find<Tab>/			/
+an 20.420	 &Edit.Find\ and\ Rep&lace<Tab>:%s	:%s/
+vunmenu	 	 &Edit.Find\ and\ Rep&lace<Tab>:%s
+vnoremenu	 &Edit.Find\ and\ Rep&lace<Tab>:s	:s/
 
 an 20.425	 &Edit.-SEP3-		<Nop>
 an 20.435	 &Edit.vimrc		:call <SID>EditVimrc()<CR>
+an 20.436    &Edit.gvimrc       :call <SID>EditGvimrc()<CR>
 
 fun! s:EditVimrc()
-  if $MYVIMRC != ''
-    let fname = $MYVIMRC
-  elseif has("win32")
-    let fname = $VIMFILES . "/vimrc"
+  let fname = $VIMFILES . "/vimrc"
+  let fname = s:FnameEscape(fname)
+  if &mod
+    exe "split " . fname
   else
-    let fname = $HOME . "/.vimrc"
+    exe "edit " . fname
   endif
+endfun
+
+fun! s:EditGvimrc()
+  let fname = $VIMFILES . "/gvimrc"
   let fname = s:FnameEscape(fname)
   if &mod
     exe "split " . fname
@@ -156,35 +152,6 @@ fun! s:FileFormat()
     set ff=mac
   endif
 endfun
-
-let s:did_setup_color_schemes = 0
-
-" Setup the View.Color Scheme submenu
-func! s:SetupColorSchemes() abort
-  if s:did_setup_color_schemes
-    return
-  endif
-  let s:did_setup_color_schemes = 1
-
-  let n = globpath(&runtimepath, "colors/*.vim", 1, 1)
-
-  " Ignore case for VMS and windows, sort on name
-  let names = sort(map(n, 'substitute(v:val, "\\c.*[/\\\\:\\]]\\([^/\\\\:]*\\)\\.vim", "\\1", "")'), 1)
-
-  " define all the submenu entries
-  let idx = 100
-  for name in names
-    exe "an 20.450." . idx . ' &View.C&olor\ Scheme.' . name . " :colors " . name . "<CR>"
-    let idx = idx + 10
-  endfor
-  silent! aunmenu &Edit.Show\ C&olor\ Schemes\ in\ Menu
-endfun
-if exists("do_no_lazyload_menus")
-  call s:SetupColorSchemes()
-else
-  an <silent> 20.450 &Edit.Show\ C&olor\ Schemes\ in\ Menu :call <SID>SetupColorSchemes()<CR>
-endif
-
 
 if has("win32") || has("gui_motif") || has("gui_gtk") || has("gui_kde") || has("gui_photon") || has("gui_mac")
   an 20.470 &Edit.Select\ Fo&nt\.\.\.	:set guifont=*<CR>
@@ -272,18 +239,6 @@ func! s:XxdFind()
     endif
   endif
 endfun
-
-" Load ColorScheme, Compiler Setting and Keymap menus when idle.
-if !exists("do_no_lazyload_menus")
-  func! s:SetupLazyloadMenus()
-    call s:SetupColorSchemes()
-  endfunc
-  augroup SetupLazyloadMenus
-    au!
-    au CursorHold,CursorHoldI * call <SID>SetupLazyloadMenus() | au! SetupLazyloadMenus
-  augroup END
-endif
-
 
 if !exists("no_buffers_menu")
 
@@ -520,6 +475,7 @@ an 70.410 &Window.Min\ Widt&h<Tab>^W1\|			<C-W>1\|
 " The popup menu
 an 1.10 PopUp.&Undo			u
 an 1.15 PopUp.-SEP1-			<Nop>
+an 1.16 PopUp.Lookup			f
 vnoremenu 1.20 PopUp.Cu&t		"+x
 vnoremenu 1.30 PopUp.&Copy		"+y
 cnoremenu 1.30 PopUp.&Copy		<C-Y>

@@ -22,7 +22,8 @@ class Tags:
 			return result.group(1)
 	return None
 	
-
+def find_gtags():
+	return "C:\\msys64\\usr\bin\\bash -l -c global"
 
     def find_tag_plugin(dirname, ext):
         pass

@@ -21,6 +21,9 @@ let s:path = fnamemodify(resolve(expand('<sfile>:p')), ":h:h") . '/py_scripts'
 "This means the option is set to the evaluation of the expression
 let &makeprg = 'python "' . s:path . '/build.py" %:p'
 
+" -> "filename", line y:x E:comment
+set efm=\"%f\"\\,\ line\ %l:%c\ %t:%m
+
 function! Snippet() 
     execute 'pyfile ' . s:path . '/snippet.py'
 endfunc
