@@ -22,9 +22,9 @@ set expandtab
 set columns=130
 set number
 
-set bs=indent,eol,start		" allow backspacing over everything in insert mode
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
 "set ai			" always set autoindenting on
-"set backup		" keep a backup file
 set viminfo='20,\"50	" read/write a .viminfo file, don't store more
 			" than 50 lines of registers
 set history=50		" keep 50 lines of command line history
@@ -32,7 +32,6 @@ set ruler		" show the cursor position all the time
 set incsearch           " Do search as one entries the search target
 set laststatus=2
 
-" set foldcolumn=2        " Add margin for fold marks
 set noerrorbells
 set vb t_vb=
 

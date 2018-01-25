@@ -41,6 +41,8 @@ function! Spacify()
 endfunc
     
 function! Gtag()
+    execute 'python import sys'
+    execute 'python sys.argv = ["' . s:path . '"]'
     execute 'pyfile ' . s:path . '/gtags.py'
 endfunc
 

@@ -1,43 +1,36 @@
 import vim
-import re
-import subprocess
 import os
+import sys
 
-class Tags:
+TYPES_DIR = "tag_types"
 
-    def __init__(self):
-        self.word_break = re.compile("[^a-zA-Z0-9]*[a-zA-Z0-9_]+[^a-zA-Z0-9_]")
-	self.last_word = re.compile("([a-zA-Z_][a-zA-Z0-9_]*)$")
+def find_tag_plugin(plugin_dir, dirname, ext):
+	"""Give a list of plugins, find which (if any) can do the tag function from the working directory dirname, given the file
+		extension ext of the file in the current vim buffer"""
+	for script in os.listdir(plugin_dir):
+		if script.endswith(".py"):
+			name = script[:-3]
+			mod = importlib.import_module("{}.{}".format(TYPES_DIR, name))
+			if hasattr(mod, "get_plugin"):
+				plugin = mod.get_plugin()
+				if plugin.can_build(dirname, ext):
+					return plugin
 
-    def get_global(self):
-        return ['global', '-x', '-r']
+	# Go up to the next level in the build tree and try again..
+	dirname, removedPath = os.path.split(dirname)
+	if dirname and removedPath:
+		return find_build_plugin(plugin_dir, dirname, ext)
+	else:
+		return None
 
-    def get_pattern(self):
-        row, col = vim.current.window.cursor
-	cline = vim.current.buffer[row-1]
-        result = self.word_break.match(cline[col:])
-        if result:
-		result = self.last_word.search(cline[:col+result.end(0)-1])
-		if result:
-			return result.group(1)
-	return None
-	
-def find_gtags():
-	return "C:\\msys64\\usr\bin\\bash -l -c global"
-
-    def find_tag_plugin(dirname, ext):
-        pass
-
-    def main(self):
-        filepath = vim.current.buffer.name
+def main():
+	print("|", sys.argv[0], "|")
+#	plugin_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), TYPES_DIR))
+	filepath = vim.current.buffer.name
 	dirname, filename = os.path.split(filepath)
-        print(os.cwd())
 	filename, ext = os.path.splitext(filename)
-	plugin = find_build_plugin(dirname, ext)
+	plugin = find_tag_plugin(plugin_dir, dirname, ext)
 	if plugin:
-	    pattern = self.get_pattern()
-	    args = self.get_global() + [pattern]
-	    answer = subprocess.check_output(args)
-	    print answer
+		plugin.run()
 
-Tags().main()
+main()
