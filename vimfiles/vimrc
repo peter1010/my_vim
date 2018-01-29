@@ -2,11 +2,11 @@
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
-  finish
+    finish
 endif
 
 if v:lang =~ "utf8$" || v:lang =~ "UTF-8$"
-   set fileencodings=utf-8,latin1
+    set fileencodings=utf-8,latin1
 endif
 
 set nocompatible	" Use Vim defaults (much better!)
@@ -33,6 +33,15 @@ set incsearch           " Do search as one entries the search target
 set laststatus=2
 
 set noerrorbells
+
+"For diffing I find folding confusing
+set diffopt=filler,foldcolumn:1,context:99999
+
+"Allowing folding but dont started folded
+set foldmethod=indent
+set foldcolumn=1
+set foldlevel=9999
+
 set vb t_vb=
 
 " All my user commands start with F12
@@ -49,20 +58,23 @@ let did_install_default_menus = 4
 
 " Only do this part when compiled with support for autocommands
 if has("autocmd")
-  " In text files, always limit the width of text to 78 characters
-  autocmd BufRead *.txt set tw=78
-  " When editing a file, always jump to the last cursor position
-  autocmd BufReadPost *
-  \ if line("'\"") > 0 && line ("'\"") <= line("$") |
-  \   exe "normal! g'\"" |
-  \ endif
+    " In text files, always limit the width of text to 78 characters
+    autocmd BufRead *.txt set tw=78
+    " When editing a file, always jump to the last cursor position
+    autocmd BufReadPost *
+    \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+    \   exe "normal! g'\"" |
+    \ endif
 endif
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
+" But dont for vimdiff as the colours mixing is confusing
 if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
+    if &diff == 0
+        syntax on
+        set hlsearch
+    endif
 endif
 
 filetype plugin indent on
@@ -71,7 +83,7 @@ autocmd FileType html set shiftwidth=2
 autocmd FileType html set softtabstop=2
 
 if &term=="xterm"
-     set t_Co=8        " Set number of colours to 8 (same as linux console)
-     set t_Sb=[4%dm
-     set t_Sf=[3%dm
+    set t_Co=8        " Set number of colours to 8 (same as linux console)
+    set t_Sb=[4%dm
+    set t_Sf=[3%dm
 endif

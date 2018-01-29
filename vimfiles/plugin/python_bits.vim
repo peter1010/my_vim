@@ -42,7 +42,7 @@ endfunc
     
 function! Gtag()
     execute 'python import sys'
-    execute 'python sys.argv = ["' . s:path . '"]'
+    execute 'python sys.argv = [r"' . s:path . '/gtags.py"]'
     execute 'pyfile ' . s:path . '/gtags.py'
 endfunc
 

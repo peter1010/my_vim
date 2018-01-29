@@ -1,6 +1,7 @@
 import vim
 import os
 import sys
+import imp
 
 TYPES_DIR = "tag_types"
 
@@ -10,22 +11,25 @@ def find_tag_plugin(plugin_dir, dirname, ext):
 	for script in os.listdir(plugin_dir):
 		if script.endswith(".py"):
 			name = script[:-3]
-			mod = importlib.import_module("{}.{}".format(TYPES_DIR, name))
+                        details = imp.find_module(name, [plugin_dir])
+			mod = imp.load_module(name, *details)
 			if hasattr(mod, "get_plugin"):
 				plugin = mod.get_plugin()
-				if plugin.can_build(dirname, ext):
+				maybe, definite = plugin.has_tags(dirname, ext)
+                                if definite:
 					return plugin
+                                elif not maybe:
+                                        return None
 
 	# Go up to the next level in the build tree and try again..
 	dirname, removedPath = os.path.split(dirname)
 	if dirname and removedPath:
-		return find_build_plugin(plugin_dir, dirname, ext)
+		return find_tag_plugin(plugin_dir, dirname, ext)
 	else:
 		return None
 
 def main():
-	print("|", sys.argv[0], "|")
-#	plugin_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), TYPES_DIR))
+	plugin_dir = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), TYPES_DIR))
 	filepath = vim.current.buffer.name
 	dirname, filename = os.path.split(filepath)
 	filename, ext = os.path.splitext(filename)

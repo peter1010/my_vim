@@ -10,7 +10,7 @@ class Tags:
 		self.last_word = re.compile("([a-zA-Z_][a-zA-Z0-9_]*)$")
 
 	def get_global(self):
-		return ['global', '-x', '-r']
+		return ['global']
 
 
 	def get_pattern(self):
@@ -25,15 +25,27 @@ class Tags:
 
 	def run(self):
 		pattern = self.get_pattern()
-		args = self.get_global() + [pattern]
-		answer = subprocess.check_output(args)
+		args = self.get_global() + ["-d", "-x", pattern]
+		answer1 = subprocess.check_output(args, cwd = self.dirname)
+		args = self.get_global() + ["-r", "-x", pattern]
+		answer2 = subprocess.check_output(args, cwd = self.dirname)
+		args = self.get_global() + ["-s", "-x", pattern]
+		answer3 = subprocess.check_output(args, cwd = self.dirname)
 		print answer
 
+	def has_tags(self, dirname, ext):
+		try:
+			answer = subprocess.check_output(self.get_global() + ["-p"], cwd = dirname)
+			self.dirname = dirname
+		except subprocess.CalledProcessError, e:
+			print(e.returncode)
+			return False, False
+		return True, True
 
-def find_tag_plugin(dirname):
-	a = "C:\\msys64\\usr\bin\\bash -l -c global"
-	return Tags()
+#def find_tag_plugin(dirname):
+#	a = "C:\\msys64\\usr\bin\\bash -l -c global"
+#	return Tags()
 
 
 def get_plugin():
-	return GTAGS()
+	return Tags()
