@@ -30,13 +30,13 @@ endfunc
 
 function! Tabify()
     execute 'python import sys'
-    execute 'python sys.argv = ["t"]'
+    execute 'python sys.argv = [r"' . s:path . '/tabify.py", "t"]'
     execute 'pyfile ' . s:path . '/tabify.py'
 endfunc
 
 function! Spacify()
     execute 'python import sys'
-    execute 'python sys.argv = ["s"]'
+    execute 'python sys.argv = [r"' . s:path . '/tabify.py", "s"]'
     execute 'pyfile ' . s:path . '/tabify.py'
 endfunc
     
@@ -46,9 +46,16 @@ function! Gtag()
     execute 'pyfile ' . s:path . '/gtags.py'
 endfunc
 
+function! DetectTabification()
+    execute 'python import sys'
+    execute 'python sys.argv = [r"' . s:path . '/tabify.py", "i"]'
+    execute 'pyfile ' . s:path . '/tabify.py'
+endfunc
+
 command! SNIPPET call Snippet()
 command! TABIFY call Tabify()
 command! SPACIFY call Spacify()
 command! GTAG call Gtag()
 
+autocmd BufRead * call DetectTabification()
 " keys

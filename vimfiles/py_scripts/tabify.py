@@ -1,10 +1,5 @@
 import vim
 
-likely_indent = None
-likely_dont_use_tabs_for_indent = None
-likely_tabs_equals_indent = None
-likely_dont_expand_tabs = None
-
 def get_ident():
 	options = vim.current.buffer.options
 	return options['shiftwidth'], options['expandtab'], options['tabstop']
@@ -37,9 +32,7 @@ def calculate_size(indent, tabstop):
 				idx = (int(idx / tabstop) + 1) * tabstop
 	return idx;
 
-prev_indent = []
 def analysis_idents(curLineNum, indent, settings):
-	global prev_indent
 	if len(indent) > 0:
 		if len(indent) > 1:
 			# Mixed tabs and whitespace
@@ -54,9 +47,9 @@ def analysis_idents(curLineNum, indent, settings):
                     
 		elif indent[0] < 0:
 			# Tabs
-			if (prev_indent == []) and (indent[0] == -1):
+			if (settings.prev_indent == []) and (indent[0] == -1):
 				settings.likely_tabs_equals_indent = True
-	prev_indent = indent	
+	settings.prev_indent = indent	
       	
 
 def tabify(currLineNum, indent, settings):
@@ -184,20 +177,23 @@ def find_idents(actionFn, settings):
 				break
 		inCommentBlock = nowInCommentBlock(line)
 		inTripleQuoteBlock = nowInTripleQuoteBlock(line)
-		print(curLineNum, indent, inCommentBlock, inTripleQuoteBlock, line)
+#		print(curLineNum, indent, inCommentBlock, inTripleQuoteBlock, line)
 		actionFn(curLineNum, indent, settings)
 
 
 class Settings:
-	pass
+        
+    def __init__(self):
+        self.prev_indent = []
+        self.likely_indent = None
 
 def main():
 	settings = Settings()
 	settings.tabstop = 4
 
-	if sys.argv[0] == 't':
+	if sys.argv[1] == 't':
 		func = tabify
-	elif sys.argv[0] == 's':
+	elif sys.argv[1] == 's':
 		func = spacify
 	else:
 		func = analysis_idents
@@ -205,8 +201,8 @@ def main():
 		find_idents(func, settings)
 	except IndexError:
 		pass
-	print(likely_indent, likely_dont_use_tabs_for_indent, likely_tabs_equals_indent, likely_dont_expand_tabs)
-	set_ident(likely_indent, likely_dont_use_tabs_for_indent, likely_tabs_equals_indent, likely_dont_expand_tabs)
+#	print(likely_indent, likely_dont_use_tabs_for_indent, likely_tabs_equals_indent, likely_dont_expand_tabs)
+#	set_ident(likely_indent, likely_dont_use_tabs_for_indent, likely_tabs_equals_indent, likely_dont_expand_tabs)
 #    row, col = vim.current.window.cursor
 #    row -= 1
 #    cline = vim.current.buffer[row]

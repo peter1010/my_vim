@@ -7,7 +7,7 @@ class GHS:
 
 	def __init__(self):
 		# "ParameterManager\GT8Common\CParMan.h", line 23: warning #64-D: declaration
-		self.warn_match = re.compile(r'^"([^"]+)",\s*line\s*(\d+):\s*(warning|fatal error)\s*#([^:]+):(.*)$')
+		self.warn_match = re.compile(r'^"([^"]+)",\s*line\s*(\d+):\s*(warning|error|fatal error)\s*#([^:]+):(.*)$')
 		self.col_match = re.compile(r'^(\s+)\^$')
 
 
@@ -44,7 +44,10 @@ class GHS:
 			if result:
 				err_filename = os.path.join(self.root, result.group(1))
 				err_line_num = result.group(2)
-				err_type = {"warning" : "W", "fatal error" : "E"}[result.group(3)] # warning or fatal error
+				err_type = {
+                                        "warning" : "W",
+                                        "fatal error" : "E"
+                                        "error" : "E" }[result.group(3)] # warning or fatal error
 				err_code = result.group(4)
 				err_comment = result.group(5)
 			elif err_comment is not None:
