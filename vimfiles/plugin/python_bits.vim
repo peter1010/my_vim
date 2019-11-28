@@ -52,10 +52,17 @@ function! DetectTabification()
     execute 'pyfile ' . s:path . '/tabify.py'
 endfunc
 
+function! Trim()
+    execute 'python import sys'
+    execute 'python sys.argv = [r"' . s:path . '/trim.py"]'
+    execute 'pyfile ' . s:path . '/trim.py'
+endfunc
+
 command! SNIPPET call Snippet()
 command! TABIFY call Tabify()
 command! SPACIFY call Spacify()
 command! GTAG call Gtag()
+command! TRIM call Trim()
 
 autocmd BufRead * call DetectTabification()
 " keys
