@@ -3,7 +3,7 @@ My Vim config
 
 Since I have to use both Microsoft Windows & Linux and want to use the same VIM settings, I have structured the files as follows.
 
-Remove the dot prefix from vim files to avoid the micosoft's poor handling of dot file and place all vim configuration files into a folder.
+Remove the dot prefix from vim files to avoid the Microsoft's poor handling of dot file and place all vim configuration files into a folder.
 
 ## On Windows:
 
