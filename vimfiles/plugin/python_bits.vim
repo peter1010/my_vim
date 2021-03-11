@@ -46,16 +46,22 @@ function! Gtag()
     execute 'pyfile ' . s:path . '/gtags.py'
 endfunc
 
-function! DetectTabification()
+function! DetectModeline()
     execute 'python import sys'
-    execute 'python sys.argv = [r"' . s:path . '/tabify.py", "i"]'
-    execute 'pyfile ' . s:path . '/tabify.py'
+    execute 'python sys.argv = [r"' . s:path . '/modelines.py", "r"]'
+    execute 'pyfile ' . s:path . '/modelines.py'
+endfunc
+
+function! SaveModeline()
+    execute 'python import sys'
+    execute 'python sys.argv = [r"' . s:path . '/modelines.py", "w"]'
+    execute 'pyfile ' . s:path . '/modelines.py'
 endfunc
 
 function! Trim()
     execute 'python import sys'
     execute 'python sys.argv = [r"' . s:path . '/trim.py"]'
-    execute 'pyfile ' . s:path . '/trim.py'
+    execute 'pyfile ' . s:path . '/modelines.py'
 endfunc
 
 command! SNIPPET call Snippet()
@@ -63,6 +69,7 @@ command! TABIFY call Tabify()
 command! SPACIFY call Spacify()
 command! GTAG call Gtag()
 command! TRIM call Trim()
+command! SAVEM call SaveModeline()
 
-autocmd BufRead * call DetectTabification()
+autocmd BufRead * call DetectModeline()
 " keys

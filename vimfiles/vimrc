@@ -13,10 +13,11 @@ set nocompatible	" Use Vim defaults (much better!)
 
 " I use an indent of 4 in my code... but leave normal tabs at 8!
 set shiftwidth=4
-set softtabstop=4
+"set softtabstop=4
 set autoindent
 
-set expandtab
+set tabstop=4
+set noexpandtab
 
 " set lines=50
 set columns=130
@@ -38,9 +39,9 @@ set noerrorbells
 set diffopt=filler,foldcolumn:1,context:99999
 
 "Allowing folding but dont started folded
-set foldmethod=indent
-set foldcolumn=1
-set foldlevel=9999
+"set foldmethod=indent
+"set foldcolumn=1
+"set foldlevel=9999
 
 set vb t_vb=
 
@@ -81,6 +82,7 @@ filetype plugin indent on
 
 autocmd FileType html set shiftwidth=2
 autocmd FileType html set softtabstop=2
+
 
 if &term=="xterm"
     set t_Co=8        " Set number of colours to 8 (same as linux console)

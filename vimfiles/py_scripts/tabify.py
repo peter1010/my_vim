@@ -1,26 +1,6 @@
 import vim
+import os
 
-def get_ident():
-	options = vim.current.buffer.options
-	return options['shiftwidth'], options['expandtab'], options['tabstop']
-
-
-def set_ident(indent, dont_use_tabs, indent_equals_tabs, dont_expand_tabs):
-#	print dir(vim.options)
-	options = vim.current.buffer.options
-	options['shiftwidth'] = indent
-	if dont_use_tabs:
-		options['softtabstop'] = indent
-		if dont_expand_tabs:
-			options['expandtab'] = False
-		else:
-			options['expandtab'] = True
-	else:
-		options['expandtab'] = False
-	if indent_equals_tabs:
-		options['tabstop'] = indent
-	else:
-		options['tabstop'] = 8
 
 def calculate_size(indent, tabstop):
 	idx = 0
@@ -30,50 +10,7 @@ def calculate_size(indent, tabstop):
 		elif ws < 0:
 			for j in range(-ws):
 				idx = (int(idx / tabstop) + 1) * tabstop
-	return idx;
-
-def analysis_idents(curLineNum, indent, settings):
-	if len(indent) > 0:
-		if len(indent) > 1:
-			# Mixed tabs and whitespace
-			settings.likely_dont_use_tabs_for_indent = True
-			settings.likely_dont_expand_tabs = True
-		elif indent[0] > 0:
-			# Spaces
-			settings.likely_dont_use_tabs_for_indent = True
-			if indent[0] > 1:
-				if (settings.likely_indent is None) or (indent[0] < settings.likely_indent):
-					settings.likely_indent = indent[0]
-                    
-		elif indent[0] < 0:
-			# Tabs
-			if (settings.prev_indent == []) and (indent[0] == -1):
-				settings.likely_tabs_equals_indent = True
-	settings.prev_indent = indent	
-      	
-
-def tabify(currLineNum, indent, settings):
-	length = calculate_size(indent, settings.tabstop)
-	num_of_tabs = int(length / settings.tabstop)
-	num_of_spaces = length - num_of_tabs * settings.tabstop
-	whitespace = '\t' * num_of_tabs + ' ' * num_of_spaces
-	num_of_chs_to_replace = sum([abs(x) for x in indent])
-	old_line = vim.current.buffer[currLineNum] 
-	if num_of_chs_to_replace == len(whitespace):
-		if old_line.startswith(whitespace):
-			return
-	vim.current.buffer[currLineNum] = whitespace + old_line[num_of_chs_to_replace:]
-
-def spacify(currLineNum, indent, settings):
-	length = calculate_size(indent, settings.tabstop)
-	whitespace = ' ' * length
-	num_of_chs_to_replace = sum([abs(x) for x in indent])
-	old_line = vim.current.buffer[currLineNum] 
-	if num_of_chs_to_replace == len(whitespace):
-		if old_line.startswith(whitespace):
-			return
-	vim.current.buffer[currLineNum] = whitespace + old_line[num_of_chs_to_replace:]
-
+		return idx
 
 
 def stillInCommentBlock(line):
@@ -89,6 +26,7 @@ def stillInCommentBlock(line):
 		else:
 			return True
 
+
 def nowInCommentBlock(line):
 	while True:
 		i = line.find("/*")
@@ -102,6 +40,7 @@ def nowInCommentBlock(line):
 		else:
 			return False
 
+
 def stillInTripleQuoteBlock(line):
 	while True:
 		i = line.find('"""')
@@ -109,7 +48,7 @@ def stillInTripleQuoteBlock(line):
 			line = line[i+3:]
 			i = line.find('"""')
 			if i >= 0:
-			   line = line[i+3:]
+				line = line[i+3:]
 			else:
 				return False
 		else:
@@ -120,7 +59,10 @@ def nowInTripleQuoteBlock(line):
 	while True:
 		i = line.find('"""')
 		if i >= 0:
+			j = line.rfind("'", i)
 			line = line[i+3:]
+			if j >= 0:
+				continue
 			i = line.find('"""')
 			if i >= 0:
 				line = line[i+3:]
@@ -129,86 +71,131 @@ def nowInTripleQuoteBlock(line):
 		else:
 			return False
 
-def find_idents(actionFn, settings):
-	tabIdents, spaceIdents = 0, 0
-	inCommentBlock = False
-	inTripleQuoteBlock = False
-	lineNum = 0
-	while True:
-		curLineNum = lineNum
-		line = vim.current.buffer[lineNum]
-		lineNum += 1
-		while line.endswith('\\'):
-			line = line[:-1] + vim.current.buffer[lineNum]
-			lineNum += 1
+
+class Whitespace:
         
-		line = line.rstrip()
-		if len(line) == 0:
-			continue
-		if inCommentBlock:
-			inCommentBlock = stillInCommentBlock(line)
-			continue
-		if inTripleQuoteBlock:
-			inTripleQuoteBlock = stillInTripleQuoteBlock(line)
-			continue
-		indent = []
-		cnt = 0
-		prevCh = None
-		for ch in line:
-			if ch == '\t':
-				if prevCh == ' ':
-					indent.append(cnt)
-					cnt = 1
-				else:
-					cnt += 1
-				prevCh = ch
-			elif ch == ' ':
-				if prevCh == '\t':
-					indent.append(-cnt)
-					cnt = 1
-				else:
-					cnt += 1
-				prevCh = ch
-			else:
-				if prevCh == ' ':
-					indent.append(cnt)
-				elif prevCh == '\t':
-					indent.append(-cnt)
-				break
-		inCommentBlock = nowInCommentBlock(line)
-		inTripleQuoteBlock = nowInTripleQuoteBlock(line)
-#		print(curLineNum, indent, inCommentBlock, inTripleQuoteBlock, line)
-		actionFn(curLineNum, indent, settings)
+	def __init__(self):
+		self.cnt = 0
 
 
-class Settings:
+	def tabify(self, currLineNum, indent):
+		if (len(indent) > 0) and ((indent[0] > 0) or (len(indent) > 1)):
+			length = calculate_size(indent, self.tabstop)
+			num_of_tabs = int(length / self.tabstop)
+			num_of_spaces = length - num_of_tabs * self.tabstop
+			whitespace = '\t' * num_of_tabs + ' ' * num_of_spaces
+			num_of_chs_to_replace = sum([abs(x) for x in indent])
+			old_line = vim.current.buffer[currLineNum] 
+			if old_line.startswith(whitespace) and num_of_chs_to_replace == len(whitespace):
+				return
+			vim.current.buffer[currLineNum] = whitespace + old_line[num_of_chs_to_replace:]
+			self.cnt -= 1
+
+
+	def spacify(self, currLineNum, indent):
+		if (len(indent) > 0) and ((indent[0] < 0) or (len(indent) > 1)):
+			length = calculate_size(indent, self.tabstop)
+			whitespace = ' ' * length
+			num_of_chs_to_replace = sum([abs(x) for x in indent])
+			old_line = vim.current.buffer[currLineNum] 
+			if old_line.startswith(whitespace) and num_of_chs_to_replace == len(whitespace):
+				return
+			vim.current.buffer[currLineNum] = whitespace + old_line[num_of_chs_to_replace:]
+			self.cnt += 1
+
+
+	def find_idents(self, actionFn):
+		inCommentBlock = False
+		inTripleQuoteBlock = False
+		inLineContdBlock = False
+		buf = vim.current.buffer
+		for lineNum in range(len(buf)):
+			line = buf[lineNum]
+
+			# Is there a line continuation marker, meaning next line is
+			# continuation of this line?
+			hasLineContdMarker = line.endswith('\\')
         
-    def __init__(self):
-        self.prev_indent = []
-        self.likely_indent = None
+			if inLineContdBlock:
+				inLineContdBlock = hasLineContdMarker
+				continue
+			inLineContdBlock = hasLineContdMarker
+
+			line = line.rstrip()
+			if len(line) == 0:
+				continue
+			if inCommentBlock:
+				inCommentBlock = stillInCommentBlock(line)
+				continue
+			if inTripleQuoteBlock:
+				inTripleQuoteBlock = stillInTripleQuoteBlock(line)
+				continue
+			indent = []
+			cnt = 0
+			prevCh = None
+			for ch in line:
+				if ch == '\t':
+					if prevCh == ' ':
+						indent.append(cnt)
+						cnt = 1
+					else:
+						cnt += 1
+				elif ch == ' ':
+					if prevCh == '\t':
+						indent.append(-cnt)
+						cnt = 1
+					else:
+						cnt += 1
+				else:
+					if prevCh == ' ':
+						indent.append(cnt)
+					elif prevCh == '\t':
+						indent.append(-cnt)
+					elif len(indent) == 0:
+						indent.append(0)
+					break
+
+				prevCh = ch
+			inCommentBlock = nowInCommentBlock(line)        
+			inTripleQuoteBlock = nowInTripleQuoteBlock(line)
+#			print(lineNum, indent, inTripleQuoteBlock)
+			actionFn(lineNum, tuple(indent))
+
+	def load_settings(self):
+		buf = vim.current.buffer
+		dirpath, filename = os.path.split(buf.name)
+		modelines = os.path.join(dirpath, ".modelines")
+		try:
+			with open("modelines", "r") as inFp:
+				for line in inFp:
+					if line.startswith(filename + '\t'):
+						modeline = line[len(filename)+1:]
+						break
+		except IOError:
+			modeline = None
+
 
 def main():
-	settings = Settings()
-	settings.tabstop = 4
+	settings = Whitespace()
+	options = vim.current.buffer.options
+	settings.tabstop = options['tabstop']
 
 	if sys.argv[1] == 't':
-		func = tabify
+		func = settings.tabify
 	elif sys.argv[1] == 's':
-		func = spacify
+		func = settings.spacify
 	else:
-		func = analysis_idents
-	try:
-		find_idents(func, settings)
-	except IndexError:
-		pass
-#	print(likely_indent, likely_dont_use_tabs_for_indent, likely_tabs_equals_indent, likely_dont_expand_tabs)
-#	set_ident(likely_indent, likely_dont_use_tabs_for_indent, likely_tabs_equals_indent, likely_dont_expand_tabs)
-#    row, col = vim.current.window.cursor
-#    row -= 1
-#    cline = vim.current.buffer[row]
-#
-#    func = select_snippet(cline)
-#    if func:
-#        func(row)
+		settings.load_settings()
+		func = None
+	if func:
+		settings.find_idents(func)
+
+	if settings.cnt > 0:
+		print("% i lines spacified" % settings.cnt)
+	elif settings.cnt < 0:
+		print("% i lines tabified" % -settings.cnt)
+	else:
+		print("No lines modified")
+
 
 main()

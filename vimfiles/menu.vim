@@ -12,7 +12,6 @@ set cpo&vim
 if !exists("did_install_default_menus")
 let did_install_default_menus = 1
 
-
 " File menu
 an 10.310 &File.&Open\.\.\.<Tab>:e		:browse confirm e<CR>
 an 10.320 &File.Sp&lit-Open\.\.\.<Tab>:sp	:browse sp<CR>
@@ -99,6 +98,7 @@ fun! s:EditGvimrc()
     exe "edit " . fname
   endif
 endfun
+
 
 fun! s:FixFText()
   " Fix text in nameless register to be used with :promptfind.
@@ -232,7 +232,7 @@ endfun
 func! s:XxdFind()
   if !exists("g:xxdprogram")
     " On the PC xxd may not be in the path but in the install directory
-    if has("win32") && !executable("xxd")
+    if (has("win32") || has("dos32")) && !executable("xxd")
       let g:xxdprogram = $VIMRUNTIME . (&shellslash ? '/' : '\') . "xxd.exe"
     else
       let g:xxdprogram = "xxd"
