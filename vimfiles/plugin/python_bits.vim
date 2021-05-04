@@ -61,7 +61,7 @@ endfunc
 function! Trim()
     execute 'python import sys'
     execute 'python sys.argv = [r"' . s:path . '/trim.py"]'
-    execute 'pyfile ' . s:path . '/modelines.py'
+    execute 'pyfile ' . s:path . '/trim.py'
 endfunc
 
 command! SNIPPET call Snippet()
