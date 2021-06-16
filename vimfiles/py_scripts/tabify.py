@@ -73,7 +73,7 @@ def nowInTripleQuoteBlock(line):
 
 
 class Whitespace:
-        
+
 	def __init__(self):
 		self.cnt = 0
 
@@ -85,7 +85,7 @@ class Whitespace:
 			num_of_spaces = length - num_of_tabs * self.tabstop
 			whitespace = '\t' * num_of_tabs + ' ' * num_of_spaces
 			num_of_chs_to_replace = sum([abs(x) for x in indent])
-			old_line = vim.current.buffer[currLineNum] 
+			old_line = vim.current.buffer[currLineNum]
 			if old_line.startswith(whitespace) and num_of_chs_to_replace == len(whitespace):
 				return
 			vim.current.buffer[currLineNum] = whitespace + old_line[num_of_chs_to_replace:]
@@ -97,7 +97,7 @@ class Whitespace:
 			length = calculate_size(indent, self.tabstop)
 			whitespace = ' ' * length
 			num_of_chs_to_replace = sum([abs(x) for x in indent])
-			old_line = vim.current.buffer[currLineNum] 
+			old_line = vim.current.buffer[currLineNum]
 			if old_line.startswith(whitespace) and num_of_chs_to_replace == len(whitespace):
 				return
 			vim.current.buffer[currLineNum] = whitespace + old_line[num_of_chs_to_replace:]
@@ -115,7 +115,7 @@ class Whitespace:
 			# Is there a line continuation marker, meaning next line is
 			# continuation of this line?
 			hasLineContdMarker = line.endswith('\\')
-        
+
 			if inLineContdBlock:
 				inLineContdBlock = hasLineContdMarker
 				continue
@@ -156,7 +156,7 @@ class Whitespace:
 					break
 
 				prevCh = ch
-			inCommentBlock = nowInCommentBlock(line)        
+			inCommentBlock = nowInCommentBlock(line)
 			inTripleQuoteBlock = nowInTripleQuoteBlock(line)
 #			print(lineNum, indent, inTripleQuoteBlock)
 			actionFn(lineNum, tuple(indent))
