@@ -5,12 +5,12 @@ import os
 def calculate_size(indent, tabstop):
 	idx = 0
 	for ws in indent:
-		if ws > 0:
+		if ws > 0:		# Number of spaces
 			idx += ws;
-		elif ws < 0:
+		elif ws < 0:	# Number of tabs
 			for j in range(-ws):
 				idx = (int(idx / tabstop) + 1) * tabstop
-		return idx
+	return idx
 
 
 def stillInCommentBlock(line):
