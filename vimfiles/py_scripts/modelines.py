@@ -30,6 +30,7 @@ def set_modeline(modeline):
 		idx = token.find("=")
 		if idx >= 0:
 			name, value = token[:idx], token[idx+1:]
+			value = int(value)
 		elif token.startswith("no"):
 			name, value = token[2:], False
 		else:
@@ -37,39 +38,60 @@ def set_modeline(modeline):
 		if name in ALLOW_SETTINGS:
 			options[name] = value
 
+def find_modelines():
+	buf = vim.current.buffer
+	dirpath, filename = os.path.split(os.path.abspath(buf.name))
+	if os.name.lower() == "nt":
+		filename = "_modelines"
+	else:
+		filename = ".modelines"
+	default_path = os.path.join(dirpath, filename)
+	prev_dirpath = dirpath
+	for i in range(10):
+		modelines = os.path.join(dirpath, filename)
+		if os.path.exists(modelines):
+			return modelines
+		dirpath = os.path.split(dirpath)[0]
+		if dirpath == prev_dirpath:
+			break
+		prev_dirpath = dirpath
+
+	return default_path
 
 def load_settings():
+	modelines = find_modelines()
+	print(modelines)
 	buf = vim.current.buffer
-	dirpath, filename = os.path.split(buf.name)
-	modelines = os.path.join(dirpath, ".modelines")
+	filetype = os.path.splitext(buf.name)[1].lower()
 	try:
 		with open(modelines, "r") as inFp:
 			for line in inFp:
-				if line.startswith(filename + '\t'):
-					modeline = line[len(filename)+1:]
+				if line.startswith(filetype + '\t'):
+					modeline = line[len(filetype)+1:]
 					break
 	except IOError:
 		modeline = None
+	return modeline
 
 def save_settings(modeline):
+	modelines = find_modelines()
 	buf = vim.current.buffer
-	dirpath, filename = os.path.split(buf.name)
-	modelines = os.path.join(dirpath, ".modelines")
+	filetype = os.path.splitext(buf.name)[1].lower()
 	found = False
 	lines = []
 	try:
 		with open(modelines, "r") as inFp:
 			for line in inFp:
-				if line.startswith(filename + '\t'):
+				if line.startswith(filetype + '\t'):
 					if not found:
 						found = True
-						lines.append(filename + '\t' + modeline + '\n')
+						lines.append(filetype + '\t' + modeline + '\n')
 				else:
 					lines.append(line)
 	except IOError:
 		pass
 	if not found:
-		lines.append(filename + '\t' + modeline + '\n')
+		lines.append(filetype + '\t' + modeline + '\n')
 
 	with open(modelines, "w") as outFp:
 		outFp.writelines(lines)
@@ -80,7 +102,7 @@ def main():
 	if sys.argv[1] == 'r':
 		modeline = load_settings()
 		if modeline:
-			set_settings(modeline)
+			set_modeline(modeline)
 	elif sys.argv[1] == 'w':
 		modeline = get_modeline()
 		save_settings(modeline)
