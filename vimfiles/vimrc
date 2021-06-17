@@ -19,9 +19,9 @@ set autoindent
 set tabstop=4
 set noexpandtab
 
-" set lines=50
-set columns=130
 set number
+set nowrap
+set listchars=tab:>-,precedes:^,extends:$
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -66,6 +66,10 @@ if has("autocmd")
     \ if line("'\"") > 0 && line ("'\"") <= line("$") |
     \   exe "normal! g'\"" |
     \ endif
+endif
+
+if has("gui_running")
+   set guioptions-=T
 endif
 
 " Switch syntax highlighting on, when the terminal has colors
