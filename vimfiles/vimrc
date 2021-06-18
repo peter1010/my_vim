@@ -43,6 +43,7 @@ set diffopt=filler,foldcolumn:1,context:99999
 "set foldcolumn=1
 "set foldlevel=9999
 
+"Disable annoying beep
 set vb t_vb=
 
 " All my user commands start with F12
@@ -59,8 +60,6 @@ let did_install_default_menus = 4
 
 " Only do this part when compiled with support for autocommands
 if has("autocmd")
-    " In text files, always limit the width of text to 78 characters
-    autocmd BufRead *.txt set tw=78
     " When editing a file, always jump to the last cursor position
     autocmd BufReadPost *
     \ if line("'\"") > 0 && line ("'\"") <= line("$") |
@@ -82,6 +81,10 @@ if &t_Co > 2 || has("gui_running")
     endif
 endif
 
+" Enable file type detection.
+" Use the default filetype settings, so that mail gets 'tw' set to 72,
+" 'cindent' is on in C files, etc.
+" Also load indent files, to automatically do language-dependent indenting.
 filetype plugin indent on
 
 autocmd FileType html set shiftwidth=2

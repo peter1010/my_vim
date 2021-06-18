@@ -63,6 +63,7 @@ def load_settings():
 	print(modelines)
 	buf = vim.current.buffer
 	filetype = os.path.splitext(buf.name)[1].lower()
+	modeline = None
 	try:
 		with open(modelines, "r") as inFp:
 			for line in inFp:
@@ -70,7 +71,7 @@ def load_settings():
 					modeline = line[len(filetype)+1:]
 					break
 	except IOError:
-		modeline = None
+		pass
 	return modeline
 
 def save_settings(modeline):

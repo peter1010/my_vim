@@ -11,7 +11,7 @@ def find_tag_plugin(plugin_dir, dirname, ext):
 	for script in os.listdir(plugin_dir):
 		if script.endswith(".py"):
 			name = script[:-3]
-                        details = imp.find_module(name, [plugin_dir])
+			details = imp.find_module(name, [plugin_dir])
 			mod = imp.load_module(name, *details)
 			if hasattr(mod, "get_plugin"):
 				plugin = mod.get_plugin()
@@ -28,13 +28,26 @@ def find_tag_plugin(plugin_dir, dirname, ext):
 	else:
 		return None
 
+def setup_cscope():
+	options = vim.options
+	options["cscopeprg"] = "C:\\msys64\\usr\\bin\\gtags-cscope.exe"
+	pass
+
 def main():
-	plugin_dir = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), TYPES_DIR))
-	filepath = vim.current.buffer.name
-	dirname, filename = os.path.split(filepath)
-	filename, ext = os.path.splitext(filename)
-	plugin = find_tag_plugin(plugin_dir, dirname, ext)
-	if plugin:
-		plugin.run()
+	if sys.argv[1] == 'b':
+
+		print("|", sys.argv[0], "|")
+		try:
+			plugin_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), TYPES_DIR))
+		except NameError:
+			plugin_dir = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), TYPES_DIR))
+		filepath = vim.current.buffer.name
+		dirname, filename = os.path.split(filepath)
+		filename, ext = os.path.splitext(filename)
+		plugin = find_tag_plugin(plugin_dir, dirname, ext)
+		if plugin:
+			plugin.run()
+	elif sys.argv[1] == 'c':
+		setup_cscope()
 
 main()

@@ -42,14 +42,16 @@ endfunc
     
 function! Gtag()
     execute 'python import sys'
-    execute 'python sys.argv = [r"' . s:path . '/gtags.py"]'
+    execute 'python sys.argv = [r"' . s:path . '/gtags.py", "b"]'
     execute 'pyfile ' . s:path . '/gtags.py'
 endfunc
 
-function! DetectModeline()
+function! NewBuffer()
     execute 'python import sys'
     execute 'python sys.argv = [r"' . s:path . '/modelines.py", "r"]'
     execute 'pyfile ' . s:path . '/modelines.py'
+    execute 'python sys.argv = [r"' . s:path . '/gtags.py", "a"]'
+    execute 'pyfile ' . s:path . '/gtags.py'
 endfunc
 
 function! SaveModeline()
@@ -61,8 +63,15 @@ endfunc
 function! Trim()
     execute 'python import sys'
     execute 'python sys.argv = [r"' . s:path . '/trim.py"]'
-    execute 'pyfile ' . s:path . '/trim.py'
+    execute 'pyfile ' . s:path . '/modelines.py'
 endfunc
+
+function! SetCScope()
+    execute 'python import sys'
+    execute 'python sys.argv = [r"' . s:path . '/gtags.py", "c"]'
+    execute 'pyfile ' . s:path . '/gtags.py'
+endfunc
+
 
 command! SNIPPET call Snippet()
 command! TABIFY call Tabify()
@@ -71,5 +80,7 @@ command! GTAG call Gtag()
 command! TRIM call Trim()
 command! SAVEM call SaveModeline()
 
-autocmd BufRead * call DetectModeline()
+call SetCScope()
+
+autocmd BufRead * call NewBuffer()
 " keys
